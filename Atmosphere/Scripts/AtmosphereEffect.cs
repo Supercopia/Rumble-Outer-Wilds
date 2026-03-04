@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using MelonLoader;  // Added for debug logging
+using MelonLoader;
+using OuterWildsRumble; // Added for debug logging
 
-public class AtmosphereEffect : MonoBehaviour //REMOVE COMMENTS
+public class AtmosphereEffect : MonoBehaviour
 {
 	public AtmosphereProfile profile;
 
@@ -26,13 +27,13 @@ public class AtmosphereEffect : MonoBehaviour //REMOVE COMMENTS
 	private void OnEnable() 
 	{
 		MelonLogger.Msg($"[AtmosphereEffect] OnEnable on {gameObject.name}");
-		AtmosphereRendererFeatureTest.AtmosphereRenderPassTest.RegisterEffect(this);
+		AtmosphereRenderPassTest.RegisterEffect(this);
 		MelonLogger.Msg($"[AtmosphereEffect] Registered with render pass for {gameObject.name}");
 
 		// Try to create the material immediately if the shader is already loaded
 		try
 		{
-			//GetMaterial(OuterWildsRumble.Main.atmosphereShader);
+			GetMaterial(OuterWildsRumble.Main.atmosphereShader);
 			if (material != null)
 				MelonLogger.Msg($"[AtmosphereEffect] Material created on OnEnable for {gameObject.name} with shader: {material.shader?.name}");
 		}
@@ -52,7 +53,7 @@ public class AtmosphereEffect : MonoBehaviour //REMOVE COMMENTS
 		{
 			try
 			{
-				//GetMaterial(OuterWildsRumble.Main.atmosphereShader);
+				GetMaterial(OuterWildsRumble.Main.atmosphereShader);
 			}
 			catch (System.Exception e)
 			{
@@ -110,7 +111,7 @@ public class AtmosphereEffect : MonoBehaviour //REMOVE COMMENTS
 	private void OnDisable() 
 	{
 		MelonLogger.Msg($"[AtmosphereEffect] OnDisable on {gameObject.name}");
-		AtmosphereRendererFeatureTest.AtmosphereRenderPassTest.RemoveEffect(this);
+		AtmosphereRenderPassTest.RemoveEffect(this);
 
 		if (computeInstance != null) 
 		{
