@@ -39,7 +39,7 @@ namespace OuterWildsRumble
         const string outerWildsBundlePath = "OuterWildsRumble.OuterWildsStuff.outerwilds";
         const string eventHorizonBundlePath = "OuterWildsRumble.OuterWildsStuff.eventhorizon";
         
-
+        public static Shader atmosphereShader;
         
         public override void OnLateInitializeMelon()
         {
@@ -51,6 +51,8 @@ namespace OuterWildsRumble
             ClassInjector.RegisterTypeInIl2Cpp<SolarSystem>();
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereEffect>();
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereProfile>();
+            
+            
         }
 
         private void SceneLoaded(string mapName)

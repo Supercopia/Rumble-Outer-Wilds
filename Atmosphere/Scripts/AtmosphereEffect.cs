@@ -27,7 +27,7 @@ public class AtmosphereEffect : MonoBehaviour
 	private void OnEnable() 
 	{
 		MelonLogger.Msg($"[AtmosphereEffect] OnEnable on {gameObject.name}");
-		AtmosphereRenderPassTest.RegisterEffect(this);
+		AtmosphereRendererFeatureTest.AtmosphereRenderPassTest.RegisterEffect(this);
 		MelonLogger.Msg($"[AtmosphereEffect] Registered with render pass for {gameObject.name}");
 
 		// Try to create the material immediately if the shader is already loaded
@@ -111,7 +111,7 @@ public class AtmosphereEffect : MonoBehaviour
 	private void OnDisable() 
 	{
 		MelonLogger.Msg($"[AtmosphereEffect] OnDisable on {gameObject.name}");
-		AtmosphereRenderPassTest.RemoveEffect(this);
+		AtmosphereRendererFeatureTest.AtmosphereRenderPassTest.RemoveEffect(this);
 
 		if (computeInstance != null) 
 		{
