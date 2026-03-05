@@ -1,0 +1,3 @@
+﻿- Find default URP asset
+- Find its Universal render data, Add the atmosphere render feature, add the atmosphere shader
+- Enable post-processing on all cameras  DONE
