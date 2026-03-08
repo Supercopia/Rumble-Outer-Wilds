@@ -59,10 +59,6 @@
             <SpecificVersion>False</SpecificVersion>
             <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\MelonLoader.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-            <SpecificVersion>False</SpecificVersion>
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
-        </Reference>
         <Reference Include="RumbleModdingAPI">
             <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\Mods\RumbleModdingAPI.dll</HintPath>
         </Reference>
@@ -105,10 +101,13 @@
       <None Remove="OuterWildsStuff\atmosphere" />
     </ItemGroup>
 
+    <!-- To remove atmosphere stuff 
     <ItemGroup>
-        <None Remove="Atmosphere\**" />
-        <Compile Remove="Atmosphere\**" />
-        <EmbeddedResource Remove="Atmosphere\**" />
+        <None Remove="Atmosphere\Hope\**" />
+        <Compile Remove="Atmosphere\Hope\**" />
+        <EmbeddedResource Remove="Atmosphere\Hope\**" />
     </ItemGroup>
+    -->
+    
 
 </Project>

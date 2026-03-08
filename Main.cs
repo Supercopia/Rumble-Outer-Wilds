@@ -10,7 +10,10 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using Il2CppInterop.Runtime.InteropTypes;
+using OuterWildsRumble.Atmosphere.Hope;
+using OuterWildsRumble.Atmosphere.Scripts;
 using BuildInfo = OuterWildsRumble.BuildInfo;
+using Object = UnityEngine.Object;
 
 [assembly: MelonInfo(typeof(OuterWildsRumble.Main), BuildInfo.ModName, BuildInfo.ModVersion, BuildInfo.Author)]
 [assembly: MelonGame("Buckethead Entertainment", "RUMBLE")]
@@ -40,6 +43,11 @@ namespace OuterWildsRumble
         const string eventHorizonBundlePath = "OuterWildsRumble.OuterWildsStuff.eventhorizon";
         
         public static Shader atmosphereShader;
+        public static Material copyDepthMaterial;
+        public static AtmosphereProfile defaultAtmosphereProfile;
+        public static ComputeShader opticalDepth;
+        
+        public static ScriptableRendererData activeRenderData;
         
         public override void OnLateInitializeMelon()
         {
@@ -49,11 +57,41 @@ namespace OuterWildsRumble
             ClassInjector.RegisterTypeInIl2Cpp<QuantumObject>();
             ClassInjector.RegisterTypeInIl2Cpp<HourGlassTwins>();
             ClassInjector.RegisterTypeInIl2Cpp<SolarSystem>();
-            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereEffect>();
-            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereProfile>();
             
+            ClassInjector.RegisterTypeInIl2Cpp<AtmosphereEffect>();
+            ClassInjector.RegisterTypeInIl2Cpp<AtmosphereProfile>();
             
+            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRendererFeatureTest>();
+            //ClassInjector.RegisterTypeInIl2Cpp<DepthStackRenderFeature>();
+            ClassInjector.RegisterTypeInIl2Cpp<TestRenderFeature>();//TODO 
+            
+            ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRenderPass>();
+            ClassInjector.RegisterTypeInIl2Cpp<BlitEndRenderPass>();
+            ClassInjector.RegisterTypeInIl2Cpp<BlitStartRenderPass>();
+            ClassInjector.RegisterTypeInIl2Cpp<DepthStackRenderPass>();
+            
+            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRendererFeatureTest>();
+
+            atmosphereShader = AssetBundles.LoadAssetFromStream<Shader>(this, outerWildsBundlePath, "AtmosphereNew");
+            copyDepthMaterial = AssetBundles.LoadAssetFromStream<Material>(this, outerWildsBundlePath, "CopyDepth");
+            opticalDepth = AssetBundles.LoadAssetFromStream<ComputeShader>(this, outerWildsBundlePath, "OpticalDepth");
+            defaultAtmosphereProfile =  AtmosphereProfileFactory.CreateDefaultAtmosphereProfile(opticalDepth);
+            
+            Object.DontDestroyOnLoad(atmosphereShader);
+            Object.DontDestroyOnLoad(defaultAtmosphereProfile);
+            Object.DontDestroyOnLoad(opticalDepth);
+            atmosphereShader.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            defaultAtmosphereProfile.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            opticalDepth.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            
+            ScriptableObject.CreateInstance<TestRenderFeature>().hideFlags = HideFlags.DontUnloadUnusedAsset; //TODO
+            
+            //AtmosphereSetup.InjectAtmosphereFeatureAtRuntime(atmosphereShader);
+            //AtmosphereSetup.AddAtmosphereFeatureAtRuntime();TODO
+            //AtmosphereSetup.Test();
+            //AtmospherePassManager.Init(atmosphereShader);
         }
+        
 
         private void SceneLoaded(string mapName)
         {
@@ -404,6 +442,14 @@ namespace OuterWildsRumble
             heartOrbit.orbitSpeed = 1f;             
             heartOrbit.spinSpeed = 13.5f;       
             heartOrbit.orbitAxis = Vector3.up;
+            
+            AtmosphereEffect atmosphere = solarSystem.TimberHearth.AddComponent<AtmosphereEffect>();
+            atmosphere.sun = solarSystem.Sun.transform;
+            atmosphere.directional = false;
+            atmosphere.cutoffDepth = 0.5f;
+            atmosphere.planetRadius = 90f;
+            atmosphere.profile = defaultAtmosphereProfile;
+            
 
             // --- SETUP ATTLEROCK ---
             if (solarSystem.Attlerock != null)

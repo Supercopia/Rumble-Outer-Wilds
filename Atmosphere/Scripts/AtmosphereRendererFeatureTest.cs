@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Il2CppInterop.Runtime.Injection;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -9,6 +10,7 @@ public class AtmosphereRendererFeatureTest : ScriptableRendererFeature
 {
     // Expose the active instance so other systems (Main) can set the shader after load
     public static AtmosphereRendererFeatureTest Instance;
+    
 
     // The class that previously lived in frameData. 
     // Since older URP versions don't have ContextContainer, we manage this instance in the Feature.
@@ -134,7 +136,7 @@ public class AtmosphereRendererFeatureTest : ScriptableRendererFeature
 
     // --- RENDER PASSES ---
 
-    class BlitStartRenderPass : ScriptableRenderPass
+    public class BlitStartRenderPass : ScriptableRenderPass
     {
         private BlitData m_BlitData;
         
@@ -230,8 +232,10 @@ public class AtmosphereRendererFeatureTest : ScriptableRendererFeature
                     currentActiveEffects.RemoveAt(i);
                     continue;
                 }
+                
+                List<Plane> cameraPlaneList = new List<Plane>(cameraPlanes);
 
-                if (currentActiveEffects[i].IsVisible(cameraPlanes))
+                if (currentActiveEffects[i].IsVisible(camera))
                 {
                     float dstToSurface = currentActiveEffects[i].DistToAtmosphere(viewPos);
                     visibleEffects.Add(new SortedEffect { effect = currentActiveEffects[i], distanceToEffect = dstToSurface });
@@ -298,7 +302,7 @@ public class AtmosphereRendererFeatureTest : ScriptableRendererFeature
         }
     }
 
-    class BlitEndRenderPass : ScriptableRenderPass
+    public class BlitEndRenderPass : ScriptableRenderPass
     {
         private BlitData m_BlitData;
 

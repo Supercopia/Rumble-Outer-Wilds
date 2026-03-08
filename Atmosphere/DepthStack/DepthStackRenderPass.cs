@@ -1,4 +1,7 @@
 using System.Collections.ObjectModel;
+using Il2CppInterop.Runtime.Injection;
+using MelonLoader;
+using OuterWildsRumble.Atmosphere.Hope;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -18,6 +21,14 @@ public class DepthStackRenderPass : ScriptableRenderPass
     {
         this.copyDepth = copyDepth;
     }
+    
+    public DepthStackRenderPass(IntPtr ptr) : base(ptr) { }
+
+    public DepthStackRenderPass() 
+        : base(ClassInjector.DerivedConstructorPointer<DepthStackRenderPass>())
+    {
+        ClassInjector.DerivedConstructorBody(this);
+    }
 
 
     public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData) 
@@ -33,6 +44,7 @@ public class DepthStackRenderPass : ScriptableRenderPass
 
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) 
     {
+        MelonLogger.Msg("Executing DepthStackRenderPass");
         if (copyDepth == null) 
         {
             return;

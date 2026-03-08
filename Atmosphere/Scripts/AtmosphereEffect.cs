@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 using MelonLoader;
-using OuterWildsRumble; // Added for debug logging
+using OuterWildsRumble;
+using OuterWildsRumble.Atmosphere.Hope; // Added for debug logging
 
 public class AtmosphereEffect : MonoBehaviour
 {
@@ -28,19 +29,20 @@ public class AtmosphereEffect : MonoBehaviour
 	{
 		MelonLogger.Msg($"[AtmosphereEffect] OnEnable on {gameObject.name}");
 		AtmosphereRendererFeatureTest.AtmosphereRenderPassTest.RegisterEffect(this);
+		AtmospherePassManager.ActiveEffects.Add(this);
 		MelonLogger.Msg($"[AtmosphereEffect] Registered with render pass for {gameObject.name}");
 
-		// Try to create the material immediately if the shader is already loaded
-		try
-		{
-			GetMaterial(OuterWildsRumble.Main.atmosphereShader);
-			if (material != null)
-				MelonLogger.Msg($"[AtmosphereEffect] Material created on OnEnable for {gameObject.name} with shader: {material.shader?.name}");
-		}
-		catch (System.Exception e)
-		{
-			MelonLogger.Msg($"[AtmosphereEffect] Exception while creating material in OnEnable for {gameObject.name}: {e.Message}");
-		}
+		// // Try to create the material immediately if the shader is already loaded
+		// try
+		// {
+		// 	GetMaterial(OuterWildsRumble.Main.atmosphereShader);
+		// 	if (material != null)
+		// 		MelonLogger.Msg($"[AtmosphereEffect] Material created on OnEnable for {gameObject.name} with shader: {material.shader?.name}");
+		// }
+		// catch (System.Exception e)
+		// {
+		// 	MelonLogger.Msg($"[AtmosphereEffect] Exception while creating material in OnEnable for {gameObject.name}: {e.Message}");
+		// }
 	}
 
 	private int ticksBeforeCheck = 240;
@@ -112,6 +114,7 @@ public class AtmosphereEffect : MonoBehaviour
 	{
 		MelonLogger.Msg($"[AtmosphereEffect] OnDisable on {gameObject.name}");
 		AtmosphereRendererFeatureTest.AtmosphereRenderPassTest.RemoveEffect(this);
+		AtmospherePassManager.ActiveEffects.Remove(this);
 
 		if (computeInstance != null) 
 		{
@@ -139,7 +142,7 @@ public class AtmosphereEffect : MonoBehaviour
 		bool sizeChange = _size != planetRadius || _scale != atmosphereScale;
 		bool textureExists = opticalDepthTexture != null && opticalDepthTexture.IsCreated();
 
-		MelonLogger.Msg($"[AtmosphereEffect] ValidateOpticalDepth: upToDate={upToDate}, sizeChange={sizeChange}, textureExists={textureExists}");
+		//MelonLogger.Msg($"[AtmosphereEffect] ValidateOpticalDepth: upToDate={upToDate}, sizeChange={sizeChange}, textureExists={textureExists}");
 
 		if (!upToDate || sizeChange || !textureExists) 
 		{
@@ -216,8 +219,9 @@ public class AtmosphereEffect : MonoBehaviour
 		return material;
 	}
 
-	public bool IsVisible(Plane[] cameraPlanes) 
+	public bool IsVisible(Camera cam) 
 	{
+		Plane[] cameraPlanes = GeometryUtility.CalculateFrustumPlanes(cam);
 		if (profile == null || sun == null) 
 		{
 			MelonLogger.Warning($"[AtmosphereEffect] IsVisible check failed because profile or sun is null on {gameObject.name}");
