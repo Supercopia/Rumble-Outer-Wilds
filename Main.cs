@@ -1,17 +1,10 @@
-﻿using System.Reflection;
-using System.Collections;
-using Il2CppInterop.Runtime.Injection;
-using Il2CppSystem.IO;
+﻿using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using OuterWildsRumble.Components;
-using RumbleModdingAPI;
 using RumbleModdingAPI.RMAPI;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using Il2CppInterop.Runtime.InteropTypes;
-using OuterWildsRumble.Atmosphere.Hope;
-using OuterWildsRumble.Atmosphere.Scripts;
 using BuildInfo = OuterWildsRumble.BuildInfo;
 using Object = UnityEngine.Object;
 
@@ -31,11 +24,9 @@ namespace OuterWildsRumble
 
     public class Main : MelonMod
     {
-        // Use the struct to hold all references
         public static SolarSystemData solarSystem;
 
         public static float heightOffset = 260f;
-        // Position where the solar solarSystem sits in the Gym
         public static Vector3 systemCenter = new Vector3(-32f, 5.5f + heightOffset, 0f);
         public static Camera playerCam;
         
@@ -48,6 +39,9 @@ namespace OuterWildsRumble
         public static ComputeShader opticalDepth;
         
         public static ScriptableRendererData activeRenderData;
+
+        public static Shader replacementShader;
+        public const string TargetShaderName = "Shader Graphs/Rumble_Move_Toon";
         
         public override void OnLateInitializeMelon()
         {
@@ -58,44 +52,63 @@ namespace OuterWildsRumble
             ClassInjector.RegisterTypeInIl2Cpp<HourGlassTwins>();
             ClassInjector.RegisterTypeInIl2Cpp<SolarSystem>();
             
-            ClassInjector.RegisterTypeInIl2Cpp<AtmosphereEffect>();
-            ClassInjector.RegisterTypeInIl2Cpp<AtmosphereProfile>();
+            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereEffect>();
+            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereProfile>();
             
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRendererFeatureTest>();
             //ClassInjector.RegisterTypeInIl2Cpp<DepthStackRenderFeature>();
-            ClassInjector.RegisterTypeInIl2Cpp<TestRenderFeature>();//TODO 
+            //ClassInjector.RegisterTypeInIl2Cpp<TestRenderFeature>();//TODO 
             
-            ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRenderPass>();
-            ClassInjector.RegisterTypeInIl2Cpp<BlitEndRenderPass>();
-            ClassInjector.RegisterTypeInIl2Cpp<BlitStartRenderPass>();
-            ClassInjector.RegisterTypeInIl2Cpp<DepthStackRenderPass>();
+            //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRenderPass>();
+            //ClassInjector.RegisterTypeInIl2Cpp<BlitEndRenderPass>();
+            //ClassInjector.RegisterTypeInIl2Cpp<BlitStartRenderPass>();
+            //ClassInjector.RegisterTypeInIl2Cpp<DepthStackRenderPass>();
             
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRendererFeatureTest>();
 
-            atmosphereShader = AssetBundles.LoadAssetFromStream<Shader>(this, outerWildsBundlePath, "AtmosphereNew");
-            copyDepthMaterial = AssetBundles.LoadAssetFromStream<Material>(this, outerWildsBundlePath, "CopyDepth");
-            opticalDepth = AssetBundles.LoadAssetFromStream<ComputeShader>(this, outerWildsBundlePath, "OpticalDepth");
-            defaultAtmosphereProfile =  AtmosphereProfileFactory.CreateDefaultAtmosphereProfile(opticalDepth);
+            //atmosphereShader = AssetBundles.LoadAssetFromStream<Shader>(this, outerWildsBundlePath, "AtmosphereNew");
+            //copyDepthMaterial = AssetBundles.LoadAssetFromStream<Material>(this, outerWildsBundlePath, "CopyDepth");
+            //opticalDepth = AssetBundles.LoadAssetFromStream<ComputeShader>(this, outerWildsBundlePath, "OpticalDepth");
+            //defaultAtmosphereProfile =  AtmosphereProfileFactory.CreateDefaultAtmosphereProfile(opticalDepth);
             
-            Object.DontDestroyOnLoad(atmosphereShader);
-            Object.DontDestroyOnLoad(defaultAtmosphereProfile);
-            Object.DontDestroyOnLoad(opticalDepth);
-            atmosphereShader.hideFlags = HideFlags.DontUnloadUnusedAsset;
-            defaultAtmosphereProfile.hideFlags = HideFlags.DontUnloadUnusedAsset;
-            opticalDepth.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            //Object.DontDestroyOnLoad(atmosphereShader);
+            //Object.DontDestroyOnLoad(defaultAtmosphereProfile);
+            //Object.DontDestroyOnLoad(opticalDepth);
+            //atmosphereShader.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            //defaultAtmosphereProfile.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            //opticalDepth.hideFlags = HideFlags.DontUnloadUnusedAsset;
             
-            ScriptableObject.CreateInstance<TestRenderFeature>().hideFlags = HideFlags.DontUnloadUnusedAsset; //TODO
+            //ScriptableObject.CreateInstance<TestRenderFeature>().hideFlags = HideFlags.DontUnloadUnusedAsset; //TODO
             
             //AtmosphereSetup.InjectAtmosphereFeatureAtRuntime(atmosphereShader);
             //AtmosphereSetup.AddAtmosphereFeatureAtRuntime();TODO
             //AtmosphereSetup.Test();
             //AtmospherePassManager.Init(atmosphereShader);
+            
+            replacementShader = AssetBundles.LoadAssetFromStream<Shader>(this, outerWildsBundlePath, "ReplacementShader");
+            replacementShader.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            Object.DontDestroyOnLoad(replacementShader);
+
+            if (replacementShader == null)
+            {
+                MelonLogger.Error("SHADER IS NULL NOOOOOOOOO");
+            }
         }
         
 
         private void SceneLoaded(string mapName)
         {
-            RenderSettings.fog = false;
+            // var cube = GameObject.CreatePrimitive(PrimitiveType.Cube); //TODO temp
+            // cube.name = "ShaderHolder";
+            // cube.GetComponent<MeshRenderer>().material.shader = replacementShader;
+
+            // string shaderName = GameObject.Find("SCENE").transform.GetChild(0).GetChild(0).gameObject.GetComponent<MeshRenderer>().material.shader.name;
+            // MelonLogger.Msg("Shader name is: " + shaderName);
+            // "Shader Graphs/MobileEnvironmentUV0"
+            
+            ReplaceAllShaders();
+            
+            RenderSettings.fog = false; 
             playerCam = Camera.main;
             switch (mapName)
             {
@@ -143,6 +156,42 @@ namespace OuterWildsRumble
                     solarSystem.PlayerShip.transform.position = new Vector3(-17.3906f, 5.0094f, -24.2655f);
                     solarSystem.PlayerShip.transform.rotation = Quaternion.Euler(0f, 88.8748f, 356.2899f);
                     break;
+            }
+        }
+
+        public void ReplaceAllShaders()
+        {
+            MelonLogger.Msg("Starting shader replacement");
+
+            if (replacementShader == null)
+            {
+                MelonLogger.Error("Replacement Shader variable is not assigned!");
+                return;
+            }
+
+            foreach (Renderer item in Object.FindObjectsOfType<Renderer>())
+            {
+                Material sharedMaterial = item.sharedMaterial;
+                if ((Object)(object)sharedMaterial == (Object)null)
+                {
+                    continue;
+                }
+                if (((Object)sharedMaterial.shader).name == "Shader Graphs/MobileEnvironmentUV0")
+                {
+                    Shader val = replacementShader;
+                    if ((Object)(object)item.sharedMaterial.shader != (Object)(object)val)
+                    {
+                        Material val2 = new Material(val);
+                        Texture texture = sharedMaterial.GetTexture("_TEXTURE");
+                        val2.SetTexture("Texture2D_2058E65A", texture);
+                        val2.SetTexture("Texture2D_3812B1EC", texture);
+                        val2.SetColor("Color_D943764B", Color.white);
+                        item.sharedMaterial = val2;
+                    }
+                }
+                item.lightmapIndex = -1;
+                item.lightProbeUsage = (LightProbeUsage)0;
+                item.reflectionProbeUsage = (ReflectionProbeUsage)0;
             }
         }
 
@@ -224,9 +273,10 @@ namespace OuterWildsRumble
                 MelonLogger.Error($"Failed to load material: {assetName}");
                 return null;
             }
-            
+
+            solarSystem.Sun = LoadAndSpawn("Sun");
             solarSystem.SunStation         = LoadAndSpawn("SunStation");
-            solarSystem.HourGlassTwins = LoadAndSpawn("HourGlassTwins");
+            solarSystem.HourGlassTwins = LoadAndSpawn("HourGlassTwinsGO");
             solarSystem.TimberHearth   = LoadAndSpawn("TimberHearth");
             solarSystem.Attlerock      = LoadAndSpawn("Attlerock");
             solarSystem.BrittleHollow      = LoadAndSpawn("BrittleHollowHollow");
@@ -244,7 +294,7 @@ namespace OuterWildsRumble
             solarSystem.WhiteHoleMaterial  = GetMaterial("WhiteHoleMaterial");
             solarSystem.BlackHoleMaterial  = GetMaterial("BlackholeMaterial");
 
-            FixsolarSystemShaders();
+            FixSolarSystemShaders();
 
             //Test stuff
             //LoadAndSpawn("AtmospherePlanet");
@@ -252,39 +302,52 @@ namespace OuterWildsRumble
         
         public static void FixShaders(GameObject spawnedObject)
         {
-            //Use "UI/Default" for full brightness
+            // Use "UI/Default" for full brightness
             // Use "Universal Render Pipeline/Lit" for the games dynamic lighting !
             string shaderName = "Universal Render Pipeline/Lit";
-        
+
             Shader vanillaShader = Shader.Find(shaderName);
 
             if (vanillaShader == null)
             {
-                MelonLogger.Warning($"Could not find the vanilla shader: {shaderName}. The devs might have renamed or stripped it!");
+                MelonLogger.Warning($"Could not find shader: {shaderName}");
                 return;
             }
+
             Renderer[] allRenderers = spawnedObject.GetComponentsInChildren<Renderer>(true);
+    
+            // Check if this is the HourGlassTwins once at the start
+            bool isTwins = spawnedObject.name.Contains("HourGlassTwins");
 
             foreach (Renderer renderer in allRenderers)
             {
+                if (isTwins && renderer.gameObject.name.Contains("Proxy"))
+                {
+                    MelonLogger.Msg("Skipping Sand on HourGlassTwins");
+                    continue;
+                }
+
                 foreach (Material mat in renderer.materials)
                 {
+                    if (mat.name.ToLower().Contains("sand") || mat.shader.name.ToLower().Contains("sand"))
+                    {
+                        MelonLogger.Msg("Found sand, ignoring");
+                        continue;
+                    }
                     mat.shader = vanillaShader;
                 }
             }
-        
+
             MelonLogger.Msg($"Successfully updated shaders on {spawnedObject.name} to {shaderName}!");
         }
         
-        public static void FixsolarSystemShaders()
+        public static void FixSolarSystemShaders()
         {
             MelonLogger.Msg("Starting shader fix for the Solar System...");
-
-            // We pass each GameObject field into the FixShaders method.
-            // The null checks prevent the mod from crashing if a planet is missing.
+            
+            //pass each GameObject field into the FixShaders method.
             if (solarSystem.Root != null) FixShaders(solarSystem.Root);
-    
-            if (solarSystem.Sun != null) FixShaders(solarSystem.Sun);
+            
             if (solarSystem.SunStation != null) FixShaders(solarSystem.SunStation);
     
             if (solarSystem.HourGlassTwins != null) FixShaders(solarSystem.HourGlassTwins);
@@ -295,7 +358,7 @@ namespace OuterWildsRumble
             if (solarSystem.BrittleHollow != null) FixShaders(solarSystem.BrittleHollow);
             if (solarSystem.HollowsLantern != null) FixShaders(solarSystem.HollowsLantern);
     
-            if (solarSystem.GiantsDeep != null) FixShaders(solarSystem.GiantsDeep);
+            //if (solarSystem.GiantsDeep != null) FixShaders(solarSystem.GiantsDeep);
             if (solarSystem.OrbitalProbeCannon != null) FixShaders(solarSystem.OrbitalProbeCannon);
             if (solarSystem.QuantumMoon != null) FixShaders(solarSystem.QuantumMoon);
     
@@ -307,56 +370,22 @@ namespace OuterWildsRumble
             if (solarSystem.Interloper != null) FixShaders(solarSystem.Interloper);
             if (solarSystem.PlayerShip != null) FixShaders(solarSystem.PlayerShip);
 
-            // We deliberately do NOT touch:
-            // system.BlackHoleMaterial
-            // system.WhiteHoleMaterial
-
             MelonLogger.Msg("Solar System shaders successfully updated!");
         }
 
         void CreateSun()
         {
-            solarSystem.Sun = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             solarSystem.Sun.transform.position = solarSystem.Root.transform.position;
-            solarSystem.Sun.transform.localScale = Vector3.one * 3f;
+            solarSystem.Sun.transform.localScale = Vector3.one * 1.65f;
             solarSystem.Sun.name = "Sun";
-            
-            // Add real light to the sun
+    
+            // let there be light
             Light sunLight = solarSystem.Sun.AddComponent<Light>();
             sunLight.type = LightType.Point;       
             sunLight.range = 15000f;                 
-            sunLight.intensity = 15000f;               
+            sunLight.intensity = 18000f;               
             sunLight.color = new Color(1f, 0.8392f, 0.7098f, 1f);
             sunLight.shadows = LightShadows.Soft;  
-
-            Renderer r = solarSystem.Sun.GetComponent<Renderer>();
-            if (r != null)
-            {
-                Color sunColor = new Color32(252, 149, 3, 255);
-                
-                float intensity = 500.0f; 
-                Color finalEmission = sunColor * intensity;
-
-                //Unlit shader check
-                Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-
-                if (shader != null)
-                {
-                    Material mat = new Material(shader);
-
-                    // Set the main color
-                    mat.SetColor("_BaseColor", sunColor);
-
-                    // Enable Emission
-                    mat.EnableKeyword("_EMISSION");
-            
-                    // Set the HDR Emission Color
-                    mat.SetColor("_EmissionColor", finalEmission);
-            
-                    // Apply material
-                    r.material = mat;
-                }
-            }
         }
 
         void CreateWhiteHole()
@@ -371,6 +400,13 @@ namespace OuterWildsRumble
             {
                 r.material = solarSystem.WhiteHoleMaterial;
             }
+            
+            Light whiteHoleLight = solarSystem.WhiteHole.AddComponent<Light>();
+            whiteHoleLight.type = LightType.Point;       
+            whiteHoleLight.range = 300f;
+            whiteHoleLight.intensity = 130f;
+            whiteHoleLight.color = new Color(1f, 1f, 1f, 1f);
+            whiteHoleLight.shadows = LightShadows.Soft;  
         }
 
         void SetupOrbitals()
@@ -400,17 +436,23 @@ namespace OuterWildsRumble
 
         void SetupSunStation()
         {
+            GameObject sunStationPivot = new GameObject("SunStationPivot");
+            
+            solarSystem.SunStation.transform.SetParent(sunStationPivot.transform, false);
             solarSystem.SunStation.transform.localScale = Vector3.one * 0.047f;
+            solarSystem.SunStation.transform.localPosition = Vector3.zero; 
             solarSystem.SunStation.transform.Rotate(0, 180f, 0);
             
-            Orbiter sunStation = solarSystem.SunStation.AddComponent<Orbiter>();
+            Orbiter sunStation = sunStationPivot.AddComponent<Orbiter>();
 
             sunStation.randomisePos = false;
             sunStation.orbitParent = solarSystem.Sun.transform;  
-            sunStation.orbitDistance = 18f / 30;
+            sunStation.orbitDistance = 23/30f;
             sunStation.orbitSpeed = 16f;     
             sunStation.spinSpeed = 16f;
             sunStation.orbitAxis = Vector3.up;
+            
+            solarSystem.SunStation = sunStationPivot;
         }
 
         void SetupHourGlassTwins()
@@ -440,18 +482,17 @@ namespace OuterWildsRumble
             heartOrbit.orbitParent = solarSystem.Sun.transform;  
             heartOrbit.orbitDistance = 5.6f;           
             heartOrbit.orbitSpeed = 1f;             
-            heartOrbit.spinSpeed = 13.5f;       
+            heartOrbit.spinSpeed = 7.5f;       
             heartOrbit.orbitAxis = Vector3.up;
             
-            AtmosphereEffect atmosphere = solarSystem.TimberHearth.AddComponent<AtmosphereEffect>();
-            atmosphere.sun = solarSystem.Sun.transform;
-            atmosphere.directional = false;
-            atmosphere.cutoffDepth = 0.5f;
-            atmosphere.planetRadius = 90f;
-            atmosphere.profile = defaultAtmosphereProfile;
+            //AtmosphereEffect atmosphere = solarSystem.TimberHearth.AddComponent<AtmosphereEffect>();
+            //atmosphere.sun = solarSystem.Sun.transform;
+            //atmosphere.directional = false;
+            //atmosphere.cutoffDepth = 0.5f;
+            //atmosphere.planetRadius = 90f;
+            //atmosphere.profile = defaultAtmosphereProfile;
             
-
-            // --- SETUP ATTLEROCK ---
+            
             if (solarSystem.Attlerock != null)
             {
                 solarSystem.Attlerock.transform.localScale = Vector3.one * 0.05f;
@@ -539,6 +580,13 @@ namespace OuterWildsRumble
                         }
                     }
                 }
+                
+                Light lanternLight = solarSystem.HollowsLantern.AddComponent<Light>();
+                lanternLight.type = LightType.Point;       
+                lanternLight.range = 300f;                 
+                lanternLight.intensity = 100f;               
+                lanternLight.color = new Color(0.851f, 0.404f, 0.059f, 1f);
+                lanternLight.shadows = LightShadows.Soft;  
             }
         }
 
@@ -629,7 +677,7 @@ namespace OuterWildsRumble
             
             quantumMoonOrbit.orbitDistance = 1.7f;                
             quantumMoonOrbit.orbitSpeed = 2f;                 
-            quantumMoonOrbit.spinSpeed = 3f;
+            quantumMoonOrbit.spinSpeed = 4f;    
             quantumMoonOrbit.orbitAxis = new Vector3(1, 1, 0);
             
             QuantumObject quantumObject = solarSystem.QuantumMoon.AddComponent<QuantumObject>();
