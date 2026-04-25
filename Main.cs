@@ -1,5 +1,6 @@
 ﻿using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
+using MelonLoader.Utils;
 using OuterWildsRumble.Components;
 using RumbleModdingAPI.RMAPI;
 using UnityEngine;
@@ -41,23 +42,31 @@ namespace OuterWildsRumble
         public static ScriptableRendererData activeRenderData;
 
         public static Shader replacementShader;
-        public const string TargetShaderName = "Shader Graphs/Rumble_Move_Toon";
+        
+        public static string folderPath = MelonEnvironment.UserDataDirectory + @"\OuterWildsRumble";
         
         public override void OnLateInitializeMelon()
         {
+            if (!Directory.Exists(folderPath))
+            {
+                MelonLogger.Warning("File at " + folderPath + " does not exist");
+                Directory.CreateDirectory(folderPath);
+            }
+            
             Actions.onMapInitialized += SceneLoaded;
             ClassInjector.RegisterTypeInIl2Cpp<Orbiter>();
             ClassInjector.RegisterTypeInIl2Cpp<EllipticalOrbiter>();
             ClassInjector.RegisterTypeInIl2Cpp<QuantumObject>();
             ClassInjector.RegisterTypeInIl2Cpp<HourGlassTwins>();
             ClassInjector.RegisterTypeInIl2Cpp<SolarSystem>();
+            ClassInjector.RegisterTypeInIl2Cpp<SignalScope>();
             
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereEffect>();
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereProfile>();
             
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRendererFeatureTest>();
             //ClassInjector.RegisterTypeInIl2Cpp<DepthStackRenderFeature>();
-            //ClassInjector.RegisterTypeInIl2Cpp<TestRenderFeature>();//TODO 
+            //ClassInjector.RegisterTypeInIl2Cpp<TestRenderFeature>();
             
             //ClassInjector.RegisterTypeInIl2Cpp<AtmosphereRenderPass>();
             //ClassInjector.RegisterTypeInIl2Cpp<BlitEndRenderPass>();
@@ -98,7 +107,7 @@ namespace OuterWildsRumble
 
         private void SceneLoaded(string mapName)
         {
-            // var cube = GameObject.CreatePrimitive(PrimitiveType.Cube); //TODO temp
+            // var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             // cube.name = "ShaderHolder";
             // cube.GetComponent<MeshRenderer>().material.shader = replacementShader;
 
@@ -157,6 +166,10 @@ namespace OuterWildsRumble
                     solarSystem.PlayerShip.transform.rotation = Quaternion.Euler(0f, 88.8748f, 356.2899f);
                     break;
             }
+            
+            var SignalScope         = LoadAndSpawn("SignalscopeGO"); 
+            SignalScope.AddComponent<SignalScope>();
+            SignalScope.transform.localScale = new Vector3(2,2,2);
         }
 
         public void ReplaceAllShaders()
@@ -235,7 +248,7 @@ namespace OuterWildsRumble
                 
             if (solarSystem.Interloper != null) solarSystem.Interloper.transform.SetParent(solarSystem.Root.transform, true);
             
-            //if (solarSystem.PlayerShip != null) solarSystem.PlayerShip.transform.SetParent(solarSystem.Root.transform, true); TODO parent it at some point ?
+            //if (solarSystem.PlayerShip != null) solarSystem.PlayerShip.transform.SetParent(solarSystem.Root.transform, true);
             
             
             solarSystem.Root.GetComponent<SolarSystem>().Scale(30f);
@@ -249,17 +262,7 @@ namespace OuterWildsRumble
         public void LoadAssets()
         {
             // Helper to load, instantiate, and log errors in one go
-            GameObject LoadAndSpawn(string assetName)
-            {
-                var asset = AssetBundles.LoadAssetFromStream<GameObject>(this, outerWildsBundlePath, assetName);
-                if (asset != null)
-                {
-                    MelonLogger.Msg($"Loaded: {assetName}");
-                    return GameObject.Instantiate(asset);
-                }
-                MelonLogger.Error($"Failed to load asset: {assetName}");
-                return null;
-            }
+            
 
             Material GetMaterial(string assetName)
             {
@@ -289,7 +292,8 @@ namespace OuterWildsRumble
             solarSystem.Interloper         = LoadAndSpawn("InterloperGameObject");
             
             solarSystem.PlayerShip         = LoadAndSpawn("HearthianSpaceShip");
-            GameObject.DontDestroyOnLoad(solarSystem.PlayerShip );
+            GameObject.DontDestroyOnLoad(solarSystem.PlayerShip);
+            
             
             solarSystem.WhiteHoleMaterial  = GetMaterial("WhiteHoleMaterial");
             solarSystem.BlackHoleMaterial  = GetMaterial("BlackholeMaterial");
@@ -298,6 +302,18 @@ namespace OuterWildsRumble
 
             //Test stuff
             //LoadAndSpawn("AtmospherePlanet");
+        }
+        
+        GameObject LoadAndSpawn(string assetName)
+        {
+            var asset = AssetBundles.LoadAssetFromStream<GameObject>(this, outerWildsBundlePath, assetName);
+            if (asset != null)
+            {
+                MelonLogger.Msg($"Loaded: {assetName}");
+                return GameObject.Instantiate(asset);
+            }
+            MelonLogger.Error($"Failed to load asset: {assetName}");
+            return null;
         }
         
         public static void FixShaders(GameObject spawnedObject)
@@ -431,6 +447,24 @@ namespace OuterWildsRumble
                 SetupQuantumMoon();
                 
                 SetupPlayerShip();
+                
+                MusicEmitter emitter = solarSystem.HourGlassTwins.AddComponent<MusicEmitter>();
+                emitter.musicFileName = "OW_TravelerTheme_drums.wav"; 
+                
+                MusicEmitter emitter1 = solarSystem.Attlerock.AddComponent<MusicEmitter>();
+                emitter1.musicFileName = "OW_TravelerTheme_whistling.wav";
+                
+                MusicEmitter emitter2 = solarSystem.BrittleHollow.AddComponent<MusicEmitter>();
+                emitter2.musicFileName = "OW_TravelerTheme_banjo.wav";
+                
+                MusicEmitter emitter3 = solarSystem.GiantsDeep.AddComponent<MusicEmitter>();
+                emitter3.musicFileName = "OW_TravelerTheme_flute.wav"; 
+                
+                MusicEmitter emitter4 = solarSystem.DarkBramble.AddComponent<MusicEmitter>();
+                emitter4.musicFileName = "OW_TravelerTheme_harmonica.wav";
+                
+                MusicEmitter emitter5 = solarSystem.QuantumMoon.AddComponent<MusicEmitter>();
+                emitter5.musicFileName = "OW_TravelerTheme_piano.wav";
             }
         }
 
@@ -491,6 +525,7 @@ namespace OuterWildsRumble
             //atmosphere.cutoffDepth = 0.5f;
             //atmosphere.planetRadius = 90f;
             //atmosphere.profile = defaultAtmosphereProfile;
+            //TODO harmonica
             
             
             if (solarSystem.Attlerock != null)

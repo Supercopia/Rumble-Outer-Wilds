@@ -31,6 +31,18 @@
         <Reference Include="Il2CppInterop.Runtime">
             <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
         </Reference>
+        <Reference Include="NAudio">
+          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\UserLibs\NAudio.dll</HintPath>
+        </Reference>
+        <Reference Include="NAudio.Core">
+          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\UserLibs\NAudio.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="NAudio.Wasapi">
+          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\Mods\NAudio.Wasapi.dll</HintPath>
+        </Reference>
+        <Reference Include="NAudio.WinMM">
+          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\UserLibs\NAudio.WinMM.dll</HintPath>
+        </Reference>
         <Reference Include="Newtonsoft.Json">
             <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\Newtonsoft.Json.dll</HintPath>
         </Reference>
