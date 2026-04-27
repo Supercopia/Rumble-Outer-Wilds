@@ -6,6 +6,7 @@ using RumbleModdingAPI.RMAPI;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.VFX;
 using BuildInfo = OuterWildsRumble.BuildInfo;
 using Object = UnityEngine.Object;
 
@@ -277,7 +278,7 @@ namespace OuterWildsRumble
                 return null;
             }
 
-            solarSystem.Sun = LoadAndSpawn("Sun");
+            solarSystem.Sun = LoadAndSpawn("SunV2");
             solarSystem.SunStation         = LoadAndSpawn("SunStation");
             solarSystem.HourGlassTwins = LoadAndSpawn("HourGlassTwinsGO");
             solarSystem.TimberHearth   = LoadAndSpawn("TimberHearth");
@@ -401,7 +402,32 @@ namespace OuterWildsRumble
             sunLight.range = 15000f;                 
             sunLight.intensity = 18000f;               
             sunLight.color = new Color(1f, 0.8392f, 0.7098f, 1f);
-            sunLight.shadows = LightShadows.Soft;  
+            sunLight.shadows = LightShadows.Soft;
+
+            SupernovaSun supernovaSun = solarSystem.Sun.AddComponent<SupernovaSun>();
+            supernovaSun.sunLight = sunLight;
+
+
+            // var mat = solarSystem.Sun.GetComponent<Renderer>().material;
+            // var shader = mat.shader;
+
+            // int count = shader.GetPropertyCount();
+            // MelonLogger.Msg("SUN CORE PROPERTIES");
+            // for (int i = 0; i < count; i++)
+            // {
+            //     MelonLogger.Msg("Shader property:" + shader.GetPropertyName(i));
+            // }
+            //
+            //
+            // var mat1 = solarSystem.Sun.transform.GetChild(0).GetComponent<Renderer>().material;
+            // var shader1 = mat1.shader;
+            //
+            // int count1 = shader1.GetPropertyCount();
+            // MelonLogger.Msg("SUN HALO PROPERTIES");
+            // for (int i = 0; i < count1; i++)
+            // {
+            //     MelonLogger.Msg("Shader property:" + shader1.GetPropertyName(i));
+            // }
         }
 
         void CreateWhiteHole()
@@ -635,7 +661,7 @@ namespace OuterWildsRumble
             giantsDeepOrbit.orbitParent = solarSystem.Sun.transform;  
             giantsDeepOrbit.orbitDistance = 10.6f;           
             giantsDeepOrbit.orbitSpeed = 0.6f;             
-            giantsDeepOrbit.spinSpeed = 5f;       
+            giantsDeepOrbit.spinSpeed = 0.2f;       
             giantsDeepOrbit.orbitAxis = Vector3.up;       
             
             if (solarSystem.OrbitalProbeCannon != null)
@@ -647,12 +673,23 @@ namespace OuterWildsRumble
                 
                 cannonOrbit.orbitParent = solarSystem.GiantsDeep.transform; 
                 cannonOrbit.orbitDistance = 1.8f;                
-                cannonOrbit.orbitSpeed = 15f;                 
-                cannonOrbit.spinSpeed = 15f;
+                cannonOrbit.orbitSpeed = 10f;                 
+                cannonOrbit.spinSpeed = 10f;
                 cannonOrbit.orbitAxis = Vector3.up;
                 cannonOrbit.randomisePos = false;
                 
                 solarSystem.OrbitalProbeCannon.transform.GetChild(0).gameObject.SetActive(false);
+
+
+                if (true) //TODO
+                {
+                    Transform probeCannonBase = solarSystem.OrbitalProbeCannon.transform.GetChild(1);
+                    probeCannonBase.GetChild(0).rotation = Quaternion.Euler(354.7151f, 225.9565f, 0);
+                    probeCannonBase.GetChild(1).rotation = Quaternion.Euler(-0f, 0f, 69.0547f);
+                    
+                    probeCannonBase.GetChild(2).rotation = Quaternion.Euler(-0, 0, 312.6561f);
+                    probeCannonBase.GetChild(2).localPosition = new Vector3(3.7276f, 0.006f, -0.006f);
+                }
             }
         }
 
@@ -715,26 +752,17 @@ namespace OuterWildsRumble
             quantumMoonOrbit.spinSpeed = 4f;    
             quantumMoonOrbit.orbitAxis = new Vector3(1, 1, 0);
             
-            QuantumObject quantumObject = solarSystem.QuantumMoon.AddComponent<QuantumObject>();
+            QuantumOrbiter quantumObject = solarSystem.QuantumMoon.AddComponent<QuantumOrbiter>();
 
-            quantumObject.orbitParents = new List<Transform> 
+            quantumObject.orbitParents = new Dictionary<Transform, float> 
             { 
-                solarSystem.HourGlassTwins.transform,
-                solarSystem.TimberHearth.transform,
-                solarSystem.BrittleHollow.transform,
-                solarSystem.GiantsDeep.transform,
-                solarSystem.DarkBramble.transform
+                { solarSystem.HourGlassTwins.transform.GetChild(2), 0.59f },
+                { solarSystem.HourGlassTwins.transform.GetChild(0), 0.59f },
+                { solarSystem.TimberHearth.transform,   0.86f },
+                { solarSystem.BrittleHollow.transform,  0.72f },
+                { solarSystem.GiantsDeep.transform,     1.7f },
+                { solarSystem.DarkBramble.transform,    1.7f }
             };
-            
-            if (quantumObject.orbitParents.Count > 0) 
-            {
-                int randomIndex = UnityEngine.Random.Range(0, quantumObject.orbitParents.Count);
-                quantumMoonOrbit.orbitParent = quantumObject.orbitParents[randomIndex];
-            }
-            else
-            {
-                quantumMoonOrbit.orbitParent = solarSystem.GiantsDeep.transform;
-            }
         }
 
         void SetupPlayerShip()

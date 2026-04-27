@@ -94,6 +94,9 @@
         <Reference Include="UnityEngine.AnimationModule">
             <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.AnimationModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.VFXModule">
+          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.VFXModule.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>

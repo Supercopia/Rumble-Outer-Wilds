@@ -19,7 +19,7 @@ public class SignalScope : MonoBehaviour
     public GameObject Camera;
     public GameObject Screen;
 
-    private const float hold_distance = 0.14f;
+    private const float hold_distance = 0.115f;
     private const float holdThreshold = 0.9f;
     private const float releaseThreshold = 0.1f;
 
@@ -51,6 +51,8 @@ public class SignalScope : MonoBehaviour
     
     private GameObject ZoomInButton;
     private GameObject ZoomOutButton;
+
+    private bool hasSetUp;
     
     Dictionary<GameObject,MusicEmitter> musicEmitters = new Dictionary<GameObject,MusicEmitter>();
 
@@ -139,6 +141,8 @@ public class SignalScope : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!hasSetUp) return;
+        
         float rightTrigger = Calls.ControllerMap.RightController.GetTrigger();
 
         if (!isHolding && rightTrigger > holdThreshold && IsHandCloseEnough(rightHandTransform.position))
@@ -176,6 +180,7 @@ public class SignalScope : MonoBehaviour
     
         ReleaseToBelt();
         MelonLogger.Msg("SignalScope: Player found, scope attached to belt.");
+        hasSetUp = true;
     }
 
     private void Grab()
