@@ -168,11 +168,18 @@ namespace OuterWildsRumble
                     break;
             }
             
+            
+            
             var SignalScope         = LoadAndSpawn("SignalscopeGO"); 
             SignalScope.AddComponent<SignalScope>();
             SignalScope.transform.localScale = new Vector3(2,2,2);
             
-            solarSystem.Sun.GetComponent<SupernovaSun>().SetPlayerTransform(Calls.Players.GetLocalPlayer().Controller.PlayerVisuals.transform.GetChild(1));
+            
+            if (solarSystem.Root != null)
+            {
+                solarSystem.Sun.GetComponent<SupernovaSun>()?.ResetAfterExplosion();
+                MelonCoroutines.Start(solarSystem.Sun.GetComponent<SupernovaSun>().FindPlayerAndSetup());
+            }
         }
 
         public void ReplaceAllShaders()

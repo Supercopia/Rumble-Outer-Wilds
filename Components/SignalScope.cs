@@ -157,7 +157,7 @@ public class SignalScope : MonoBehaviour
         HandleMusicChange();
     }
 
-    private IEnumerator FindPlayerAndSetup()
+    public IEnumerator FindPlayerAndSetup()
     {
         while (Calls.Players.GetLocalPlayer() == null || 
                Calls.Players.GetLocalPlayer().Controller == null || 

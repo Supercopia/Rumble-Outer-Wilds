@@ -4,6 +4,7 @@ using System.IO;
 using AudioSchtuff;
 using MelonLoader;
 using OuterWildsRumble.Components.SupernovaUtils;
+using RumbleModdingAPI.RMAPI;
 using UnityEngine;
 
 namespace OuterWildsRumble.Components;
@@ -17,6 +18,7 @@ public class SupernovaSun : MonoBehaviour
     private const string supernovaWallSoundName = "Sun_supernova_wall.wav";
 
     private float extraDistance = 20f;          // how far beyond the surface the wall sound reaches max volume
+    private float originalLightIntensity;
 
     // ---------- Player & expansion control ----------
     public Transform playerTransform;           // set externally via SetPlayerTransform()
@@ -91,12 +93,6 @@ public class SupernovaSun : MonoBehaviour
 
     public SupernovaSun(IntPtr ptr) : base(ptr) { }
 
-    // ---------- Public methods ----------
-    public void SetPlayerTransform(Transform player)
-    {
-        playerTransform = player;
-    }
-
     public void SetBodiesToSwallow(List<Transform> transforms)
     {
         bodiesToSwallow.Clear();
@@ -124,7 +120,11 @@ public class SupernovaSun : MonoBehaviour
         initialScale = transform.localScale;
 
         if (sunLight != null)
+        {
             sunlightOriginal = sunLight.color;
+            originalLightIntensity = sunLight.intensity;
+        }
+            
 
         MelonCoroutines.Start(InitializeAfterFrame());
 
@@ -149,6 +149,25 @@ public class SupernovaSun : MonoBehaviour
         }
         AddRequiredTarget(Main.solarSystem.WhiteHole);
         AddRequiredTarget(Main.solarSystem.DarkBramble);
+    }
+    
+    public IEnumerator FindPlayerAndSetup()
+    {
+        while (Calls.Players.GetLocalPlayer() == null || 
+               Calls.Players.GetLocalPlayer().Controller == null || 
+               Calls.Players.GetLocalPlayer().Controller.PlayerVisuals == null)
+        {
+            // Abort if the scene changes while we are waiting
+            if (this == null) yield break; 
+        
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        yield return new WaitForSeconds(1f);
+    
+        if (this == null) yield break;
+
+        playerTransform = Calls.Players.GetLocalPlayer().Controller.PlayerVisuals.transform.GetChild(1);
     }
 
     void FixedUpdate()
@@ -496,4 +515,67 @@ public class SupernovaSun : MonoBehaviour
             HaloRing2Width = a.HaloRing2Width,
         };
     }
+    
+    /// <summary>
+    /// Resets the sun completely, but ONLY if it has already finished exploding (phase Done).
+    /// Call this when loading a new scene to prepare the sun for a fresh cycle.
+    /// </summary>
+    public void ResetAfterExplosion()
+    {
+        if (currentPhase != Phase.Done)
+            return;
+
+        // Kill wall sound
+        if (wallClip != null)
+        {
+            AudioManager.FadeOut(wallClip, 0f, 0f, 0f, true);
+            wallClip = null;
+        }
+
+        // Re-enable all objects that were disabled
+        // Required targets (WhiteHole, DarkBramble)
+        foreach (var rt in requiredTargets)
+        {
+            if (rt.transform != null && !rt.transform.gameObject.activeSelf)
+                rt.transform.gameObject.SetActive(true);
+        }
+
+        // Swallowed bodies
+        foreach (var body in bodiesToSwallow)
+        {
+            if (body.transform != null && !body.transform.gameObject.activeSelf)
+                body.transform.gameObject.SetActive(true);
+        }
+
+        // Reset state
+        currentPhase = Phase.Red;
+        phaseTimer = 0f;
+        hasReachedPlayer = false;
+        isFadingOut = false;
+
+        // Restore visuals
+        transform.localScale = initialScale;
+
+        if (sunMaterial != null)
+            SunShaderUtils.ApplyCore(sunMaterial, startCore);
+        if (haloMaterial != null)
+            SunShaderUtils.ApplyHalo(haloMaterial, startHalo);
+
+        if (sunLight != null)
+        {
+            sunLight.color = sunlightOriginal;
+            sunLight.intensity = originalLightIntensity;
+        }
+    
+
+        // Clear swallowed bodies (will be re-filled by other systems)
+        bodiesToSwallow.Clear();
+
+        // Re-enable the sun itself
+        gameObject.SetActive(true);
+
+        // Re-read shader defaults on next frame
+        MelonCoroutines.Start(InitializeAfterFrame());
+    }
+    
 }
