@@ -15,7 +15,7 @@ public class SupernovaSun : MonoBehaviour
     private const string endTimesSoundName = "OW_EndTimes.wav";
     private const string supernovaCollapseSoundName = "Sun_supernova_collapse.wav";
     private const string supernovaExplosionSoundName = "Sun_supernova_explosion.wav";
-    private const string supernovaWallSoundName = "Sun_supernova_wall.wav";
+    private const string supernovaWallSoundName = "Sun_supernova_wall.wav"; //TODO, fix the sound volume of wall,
 
     private float extraDistance = 20f;          // how far beyond the surface the wall sound reaches max volume
     private float originalLightIntensity;
@@ -24,7 +24,7 @@ public class SupernovaSun : MonoBehaviour
     public Transform playerTransform;           // set externally via SetPlayerTransform()
     private bool hasReachedPlayer = false;
     private bool isFadingOut = false;
-    public float expansionSpeedWorldUnitsPerSec = 30f;   // world units per second during wall phase
+    public float expansionSpeedWorldUnitsPerSec = 22f;   // world units per second during wall phase
 
     // ---------- Required targets ----------
     // The sun must engulf ALL of these (in addition to the player) before stopping.
@@ -38,7 +38,7 @@ public class SupernovaSun : MonoBehaviour
     private List<RequiredTarget> requiredTargets = new List<RequiredTarget>();
 
     // ---------- Timing & scale settings ----------
-    public int secondsToFullRed = 60;
+    public int secondsToFullRed = 60 * 22;
     public float waitAfterRed = 60 + 32f;
     public float collapseDuration = 9.5f;
     public float explosionDuration = 3.7f;
@@ -46,13 +46,13 @@ public class SupernovaSun : MonoBehaviour
     public Vector3 collapseScale = new(0.13f, 0.13f, 0.13f);
     public Vector3 explosionTargetScale = new(2.5f, 2.5f, 2.5f);
     // How much bigger than the original the sun should be at peak red — set per-axis.
-    public Vector3 redGrowthScale = new(0.3f, 0.3f, 0.3f);
+    public Vector3 redGrowthScale = new(0.05f, 0.05f, 0.05f);
     //public Vector3 explosionMaxScale = new(15f, 15f, 15f);
 
     // ---------- Light & colour references ----------
     public Light sunLight;
     public Color sunlightOriginal;
-    public Color sunlightRed = new(0.8f, 0.116f, 0);
+    public Color sunlightRed = new(0.73f, 0.116f, 0);
     public Color sunlightWhite = Color.white;
     public Color sunlightBlue = Color.cyan;
 
@@ -77,10 +77,9 @@ public class SupernovaSun : MonoBehaviour
         public Transform transform;
         public float radius;
     }
-    private List<BodyToSwallow> bodiesToSwallow = new List<BodyToSwallow>();
+    private List<BodyToSwallow> bodiesToSwallow = new ();
 
-
-
+    
     private float sunBaseRadius;
     private float sunRadiusPerUnitScale;
 
@@ -200,13 +199,18 @@ public class SupernovaSun : MonoBehaviour
     private void UpdateRedPhase()
     {
         float t = Mathf.Clamp01(phaseTimer / secondsToFullRed);
-        float redT = Mathf.SmoothStep(0f, 1f, t * 1.2f);
+        
+        float sizeT = Mathf.SmoothStep(0f, 1f, t);
+        transform.localScale = Vector3.Lerp(initialScale, initialScale + redGrowthScale, sizeT);
 
-        transform.localScale = Vector3.Lerp(initialScale, initialScale + redGrowthScale, redT);
+        // COLOR: Use an exponential "Ease-In" curve. 
+        // Mathf.Pow(t, 2f) or Mathf.Pow(t, 3f) will make the sun stay its original 
+        // color for much longer, only aggressively turning red near the end.
+        float colorT = Mathf.Pow(t, 3f); 
 
-        SunShaderUtils.ApplyCore(sunMaterial, LerpCore(startCore, redCore, redT));
-        SunShaderUtils.ApplyHalo(haloMaterial, LerpHalo(startHalo, redHalo, redT));
-        sunLight.color = Color.Lerp(sunlightOriginal, sunlightRed, redT);
+        SunShaderUtils.ApplyCore(sunMaterial, LerpCore(startCore, redCore, colorT));
+        SunShaderUtils.ApplyHalo(haloMaterial, LerpHalo(startHalo, redHalo, colorT));
+        sunLight.color = LerpHSV(sunlightOriginal, sunlightRed, colorT);
 
         if (t >= 1f)
             OnRedFull();
@@ -236,7 +240,7 @@ public class SupernovaSun : MonoBehaviour
 
         SunShaderUtils.ApplyCore(sunMaterial, LerpCore(redCore, whiteCore, t));
         SunShaderUtils.ApplyHalo(haloMaterial, LerpHalo(redHalo, whiteHalo, t));
-        sunLight.color = Color.Lerp(sunlightRed, sunlightWhite, t);
+        sunLight.color = LerpHSV(sunlightRed, sunlightWhite, t);
     }
 
     private void UpdateExplosionPhase()
@@ -246,7 +250,7 @@ public class SupernovaSun : MonoBehaviour
 
         SunShaderUtils.ApplyCore(sunMaterial, LerpCore(whiteCore, superCore, t));
         SunShaderUtils.ApplyHalo(haloMaterial, LerpHalo(whiteHalo, superHalo, t));
-        sunLight.color = Color.Lerp(sunlightWhite, sunlightBlue, t);
+        sunLight.color = LerpHSV(sunlightWhite, sunlightBlue, t);
 
         // Keep updating wall-sound volume during explosion so the ramp is seamless.
         UpdateWallClipVolume();
@@ -284,7 +288,7 @@ public class SupernovaSun : MonoBehaviour
         for (int i = 0; i < requiredTargets.Count; i++)
         {
             RequiredTarget rt = requiredTargets[i];
-            if (rt.engulfed || rt.transform == null || !rt.transform.gameObject.activeSelf)
+            if (rt.engulfed || !rt.transform.gameObject.activeSelf)
             {
                 rt.engulfed = true;
                 requiredTargets[i] = rt;
@@ -365,8 +369,8 @@ public class SupernovaSun : MonoBehaviour
         {
             startCore = SunShaderUtils.ReadCore(sunMaterial);
             redCore = startCore;
-            redCore.Color1 = new Color(0.7f, 0.133f, 0);
-            redCore.Color2 = new Color(0.8f, 0.116f, 0);
+            redCore.Color1 = new Color(0.6f, 0.133f, 0);
+            redCore.Color2 = new Color(0.7f, 0.116f, 0);
             redCore.SunBright = 1.8f;
 
             whiteCore = startCore;
@@ -384,7 +388,7 @@ public class SupernovaSun : MonoBehaviour
         {
             startHalo = SunShaderUtils.ReadHalo(haloMaterial);
             redHalo = startHalo;
-            redHalo.HaloRing1Color = new Color(1f, 0, 0);
+            redHalo.HaloRing1Color = new Color(0.8f, 0.2f, 0.01f);
             redHalo.HaloRing2Color = new Color(0.749f, 0.012f, 0);
 
             whiteHalo = startHalo;
@@ -402,7 +406,7 @@ public class SupernovaSun : MonoBehaviour
         if (currentPhase != Phase.Red) return;
         Main.solarSystem.SunStation.gameObject.SetActive(false); //TODO swallow interloper
         
-        AudioManager.PlaySoundIfFileExists(Path.Combine(Main.folderPath, endTimesSoundName), 0.4f);
+        AudioManager.PlaySoundIfFileExists(Path.Combine(Main.folderPath, endTimesSoundName), 0.2f);
         currentPhase = Phase.RedFullWait;
         phaseTimer = 0f;
         MelonCoroutines.Start(HandlePostRedSequence());
@@ -516,6 +520,33 @@ public class SupernovaSun : MonoBehaviour
         };
     }
     
+    
+    public static Color LerpHSV(Color a, Color b, float t)
+    {
+        // 1. Convert RGB to HSV
+        Color.RGBToHSV(a, out float h1, out float s1, out float v1);
+        Color.RGBToHSV(b, out float h2, out float s2, out float v2);
+
+        // 2. Lerp the Hue using LerpAngle to ensure the shortest path around the color wheel
+        // (Mathf.LerpAngle expects degrees, so we multiply by 360, lerp, then divide back)
+        float h = Mathf.LerpAngle(h1 * 360f, h2 * 360f, t) / 360f;
+    
+        // Ensure the hue wraps correctly back into the 0-1 range
+        if (h < 0f) h += 1f; 
+
+        // 3. Standard Lerp for Saturation and Value
+        float s = Mathf.Lerp(s1, s2, t);
+        float v = Mathf.Lerp(v1, v2, t);
+
+        // 4. Convert back to RGB
+        Color result = Color.HSVToRGB(h, s, v);
+    
+        // 5. Apply the interpolated Alpha (HSVToRGB ignores alpha)
+        result.a = Mathf.Lerp(a.a, b.a, t);
+
+        return result;
+    }
+    
     /// <summary>
     /// Resets the sun completely, but ONLY if it has already finished exploding (phase Done).
     /// Call this when loading a new scene to prepare the sun for a fresh cycle.
@@ -566,10 +597,6 @@ public class SupernovaSun : MonoBehaviour
             sunLight.color = sunlightOriginal;
             sunLight.intensity = originalLightIntensity;
         }
-    
-
-        // Clear swallowed bodies (will be re-filled by other systems)
-        bodiesToSwallow.Clear();
 
         // Re-enable the sun itself
         gameObject.SetActive(true);
