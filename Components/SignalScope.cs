@@ -243,6 +243,12 @@ public class SignalScope : MonoBehaviour
         {
             GameObject body = entry.Key;
             MusicEmitter emitter = entry.Value;
+            
+            if (!body.activeSelf)
+            {
+                emitter.SetVolume(0);
+                continue;
+            }
 
             float strength = GetSignalStrengthForTarget(body, currentDetectionAngle);
             emitter.SetVolume(strength);

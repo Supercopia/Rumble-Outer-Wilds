@@ -25,6 +25,12 @@ public class MusicEmitter: MonoBehaviour
 
     public void SetVolume(float volume)
     {
+        if (!gameObject.activeSelf && clipData != null && volume > 0f)
+        {
+            AudioManager.ChangeVolume(clipData, 0);
+            return;
+        }
+        
         if (clipData != null && Math.Abs(clipData.Reader.Volume - volume) > 0.01)
         {
            AudioManager.ChangeVolume(clipData, Mathf.Clamp(volume, 0, maxVolume));

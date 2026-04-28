@@ -171,6 +171,8 @@ namespace OuterWildsRumble
             var SignalScope         = LoadAndSpawn("SignalscopeGO"); 
             SignalScope.AddComponent<SignalScope>();
             SignalScope.transform.localScale = new Vector3(2,2,2);
+            
+            solarSystem.Sun.GetComponent<SupernovaSun>().SetPlayerTransform(Calls.Players.GetLocalPlayer().Controller.PlayerVisuals.transform.GetChild(1));
         }
 
         public void ReplaceAllShaders()
@@ -491,6 +493,28 @@ namespace OuterWildsRumble
                 
                 MusicEmitter emitter5 = solarSystem.QuantumMoon.AddComponent<MusicEmitter>();
                 emitter5.musicFileName = "OW_TravelerTheme_piano.wav";
+                
+                
+                SupernovaSun sunScript = solarSystem.Sun.GetComponent<SupernovaSun>();
+                if (sunScript != null)
+                {
+                    sunScript.SetBodiesToSwallow(new List<Transform>
+                    {
+                        solarSystem.HourGlassTwins.transform,
+                        solarSystem.TimberHearth.transform,
+                        solarSystem.Attlerock.transform,
+                        solarSystem.BrittleHollow.transform,
+                        solarSystem.HollowsLantern.transform,
+                        solarSystem.GiantsDeep.transform,
+                        solarSystem.OrbitalProbeCannon.transform,
+                        solarSystem.DarkBramble.transform,
+                        solarSystem.QuantumMoon.transform,
+                        solarSystem.WhiteHole.transform,
+                        solarSystem.Interloper.transform,
+                        solarSystem.SunStation.transform,
+                        solarSystem.WhiteHoleStation.transform,
+                    });
+                }
             }
         }
 
