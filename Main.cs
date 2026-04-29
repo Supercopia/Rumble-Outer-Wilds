@@ -295,7 +295,8 @@ namespace OuterWildsRumble
             solarSystem.BrittleHollow      = LoadAndSpawn("BrittleHollowHollow");
             solarSystem.HollowsLantern     = LoadAndSpawn("HollowsLantern");
             solarSystem.GiantsDeep     = LoadAndSpawn("GiantsDeep");
-            solarSystem.OrbitalProbeCannon = LoadAndSpawn("OrbitalProbeCannon");
+            solarSystem.OrbitalProbeCannon = LoadAndSpawn("OrbitalProbeCannonGO");
+            solarSystem.OrbitalProbe = LoadAndSpawn("NomaiProbe");
             solarSystem.QuantumMoon        = LoadAndSpawn("QuantumMoon");
             solarSystem.DarkBramble        = LoadAndSpawn("DarkBramble");
             solarSystem.WhiteHoleStation   = LoadAndSpawn("WhiteHoleStation");
@@ -714,7 +715,7 @@ namespace OuterWildsRumble
 
                 if (true) //TODO
                 {
-                    Transform probeCannonBase = solarSystem.OrbitalProbeCannon.transform.GetChild(1);
+                    Transform probeCannonBase = solarSystem.OrbitalProbeCannon.transform.GetChild(0);
                     probeCannonBase.GetChild(0).rotation = Quaternion.Euler(354.7151f, 225.9565f, 0);
                     probeCannonBase.GetChild(1).rotation = Quaternion.Euler(-0f, 0f, 69.0547f);
                     
@@ -820,6 +821,7 @@ namespace OuterWildsRumble
         
         public GameObject GiantsDeep;
         public GameObject OrbitalProbeCannon;
+        public GameObject OrbitalProbe;
         public GameObject QuantumMoon;
         
         public GameObject DarkBramble;
