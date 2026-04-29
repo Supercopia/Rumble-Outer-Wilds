@@ -170,11 +170,11 @@ namespace OuterWildsRumble
             
             
             
-            solarSystem.SignalScope         = LoadAndSpawn("SignalscopeGO");
-            solarSystem.SignalScope.AddComponent<SignalScope>();
-            solarSystem.SignalScope.transform.localScale = new Vector3(2,2,2);
-            
-            
+            var SignalScope = GameObject.Instantiate(solarSystem.SignalScope);
+            SignalScope.AddComponent<SignalScope>();
+            SignalScope.transform.localScale = new Vector3(2, 2, 2);
+
+
             if (solarSystem.Root != null)
             {
                 solarSystem.Sun.GetComponent<SupernovaSun>()?.ResetAfterExplosion();
@@ -272,11 +272,26 @@ namespace OuterWildsRumble
         public void LoadAssets()
         {
             // Helper to load, instantiate, and log errors in one go
-            
+            // If only there was a place you could check how to do it... (https://supercopia.github.io/RMAPI-Reference/06-Asset-Bundles/#from-embedded-resource-stream) (Joke.)
+
+            var outerWildsBundle   = AssetBundles.LoadAssetBundleFromStream(this, outerWildsBundlePath);
+            var eventHorizonBundle = AssetBundles.LoadAssetBundleFromStream(this, eventHorizonBundlePath);
+
+            GameObject LoadAndSpawn(string assetName)
+            {
+                var asset = outerWildsBundle.LoadAsset<GameObject>(assetName);
+                if (asset != null)
+                {
+                    MelonLogger.Msg($"Loaded: {assetName}");
+                    return GameObject.Instantiate(asset);
+                }
+                MelonLogger.Error($"Failed to load asset: {assetName}");
+                return null;
+            }
 
             Material GetMaterial(string assetName)
             {
-                var material = AssetBundles.LoadAssetFromStream<Material>(this, eventHorizonBundlePath, assetName);
+                var material = eventHorizonBundle.LoadAsset<Material>(assetName);
                 if (material != null)
                 {
                     MelonLogger.Msg($"Loaded: {assetName}");
@@ -301,15 +316,24 @@ namespace OuterWildsRumble
             solarSystem.DarkBramble        = LoadAndSpawn("DarkBramble");
             solarSystem.WhiteHoleStation   = LoadAndSpawn("WhiteHoleStation");
             solarSystem.Interloper         = LoadAndSpawn("InterloperGameObject");
-            
+
             solarSystem.PlayerShip         = LoadAndSpawn("HearthianSpaceShip");
             GameObject.DontDestroyOnLoad(solarSystem.PlayerShip);
-            
-            
+
+            // Prefab cache: instances die with the player belt, so re-instantiate in SceneLoaded
+            solarSystem.SignalScope = outerWildsBundle.LoadAsset<GameObject>("SignalscopeGO");
+            solarSystem.SignalScope.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            MelonLogger.Msg("Loaded: SignalscopeGO");
+
+
             solarSystem.WhiteHoleMaterial  = GetMaterial("WhiteHoleMaterial");
             solarSystem.BlackHoleMaterial  = GetMaterial("BlackholeMaterial");
 
             FixSolarSystemShaders();
+
+            // Free the bundle data; instantiated GameObjects and Material references stay alive.
+            outerWildsBundle.Unload(false);
+            eventHorizonBundle.Unload(false);
 
             //Test stuff
             //LoadAndSpawn("AtmospherePlanet");

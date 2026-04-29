@@ -1,101 +1,133 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <RumblePath Condition="$([MSBuild]::IsOSPlatform('Windows'))">O:\SteamLibrary\steamapps\common\RUMBLE</RumblePath>
+        <RumblePath Condition="$([MSBuild]::IsOSPlatform('Linux'))">/mnt/c/Program Files (x86)/Steam/steamapps/common/RUMBLE</RumblePath>
         <TargetFramework>net6.0</TargetFramework>
+        <PlatformTarget>x64</PlatformTarget>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
         <Reference Include="0Harmony">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\0Harmony.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/net6/0Harmony.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="AssetsTools.NET">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\AssetsTools.NET.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/net6/AssetsTools.NET.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Il2CppBucketheadEntertainment.Plugins">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Il2CppBucketheadEntertainment.Plugins.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Il2CppBucketheadEntertainment.Plugins.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Il2CppRUMBLE.AssetStore.ModernUIPack">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Il2CppRUMBLE.AssetStore.ModernUIPack.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Il2CppRUMBLE.AssetStore.ModernUIPack.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Il2CppRUMBLE.Plugins">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Il2CppRUMBLE.Plugins.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Il2CppRUMBLE.Plugins.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Il2CppRUMBLE.Runtime">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Il2CppRUMBLE.Runtime.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Il2CppRUMBLE.Runtime.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Il2Cppmscorlib">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Il2Cppmscorlib.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Il2CppInterop.Runtime">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/net6/Il2CppInterop.Runtime.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="NAudio">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\UserLibs\NAudio.dll</HintPath>
+            <HintPath>$(RumblePath)/UserLibs/NAudio.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="NAudio.Core">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\UserLibs\NAudio.Core.dll</HintPath>
+            <HintPath>$(RumblePath)/UserLibs/NAudio.Core.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="NAudio.Wasapi">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\Mods\NAudio.Wasapi.dll</HintPath>
+            <HintPath>$(RumblePath)/Mods/NAudio.Wasapi.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="NAudio.WinMM">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\UserLibs\NAudio.WinMM.dll</HintPath>
+            <HintPath>$(RumblePath)/UserLibs/NAudio.WinMM.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Newtonsoft.Json">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\Newtonsoft.Json.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/net6/Newtonsoft.Json.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.RenderPipelines.Core.Runtime">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.RenderPipelines.Universal.Runtime">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.AssetBundleModule">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.AssetBundleModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.AssetBundleModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.CoreModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.Il2CppAssetBundleManager">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\UnityEngine.Il2CppAssetBundleManager.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/net6/UnityEngine.Il2CppAssetBundleManager.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule.dll">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.ImageConversionModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.ImageConversionModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="MelonLoader, Version=0.5.7.0, Culture=neutral, processorArchitecture=MSIL">
             <SpecificVersion>False</SpecificVersion>
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\net6\MelonLoader.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/net6/MelonLoader.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="RumbleModdingAPI">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\Mods\RumbleModdingAPI.dll</HintPath>
+            <HintPath>$(RumblePath)/Mods/RumbleModdingAPI.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="ModUI">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\Mods\ModUI.dll</HintPath>
+            <HintPath>$(RumblePath)/Mods/ModUI.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
             <SpecificVersion>False</SpecificVersion>
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/Unity.TextMeshPro.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.PhysicsModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.RenderAs2DModule">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Dependencies\Il2CppAssemblyGenerator\UnityDependencies\UnityEngine.RenderAs2DModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Dependencies/Il2CppAssemblyGenerator/UnityDependencies/UnityEngine.RenderAs2DModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.UI, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
             <SpecificVersion>False</SpecificVersion>
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.UI.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.AnimationModule">
-            <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.AnimationModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.AnimationModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.VFXModule">
-          <HintPath>O:\SteamLibrary\steamapps\common\RUMBLE\MelonLoader\Il2CppAssemblies\UnityEngine.VFXModule.dll</HintPath>
+            <HintPath>$(RumblePath)/MelonLoader/Il2CppAssemblies/UnityEngine.VFXModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
     </ItemGroup>
 
@@ -116,13 +148,17 @@
       <None Remove="OuterWildsStuff\atmosphere" />
     </ItemGroup>
 
-    <!-- To remove atmosphere stuff 
+    <!-- To remove atmosphere stuff
     <ItemGroup>
         <None Remove="Atmosphere\Hope\**" />
         <Compile Remove="Atmosphere\Hope\**" />
         <EmbeddedResource Remove="Atmosphere\Hope\**" />
     </ItemGroup>
     -->
-    
+
+    <Target Name="DeployToGame" AfterTargets="Build" Condition="Exists('$(RumblePath)/Mods')">
+        <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(RumblePath)/Mods/" />
+        <Message Importance="high" Text="Deployed $(AssemblyName).dll to $(RumblePath)/Mods/" />
+    </Target>
 
 </Project>
