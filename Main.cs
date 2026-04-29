@@ -170,9 +170,9 @@ namespace OuterWildsRumble
             
             
             
-            var SignalScope         = LoadAndSpawn("SignalscopeGO"); 
-            SignalScope.AddComponent<SignalScope>();
-            SignalScope.transform.localScale = new Vector3(2,2,2);
+            solarSystem.SignalScope         = LoadAndSpawn("SignalscopeGO");
+            solarSystem.SignalScope.AddComponent<SignalScope>();
+            solarSystem.SignalScope.transform.localScale = new Vector3(2,2,2);
             
             
             if (solarSystem.Root != null)
@@ -350,7 +350,7 @@ namespace OuterWildsRumble
             {
                 if (isTwins && renderer.gameObject.name.Contains("Proxy"))
                 {
-                    MelonLogger.Msg("Skipping Sand on HourGlassTwins");
+                    //MelonLogger.Msg("Skipping Sand on HourGlassTwins");
                     continue;
                 }
 
@@ -358,7 +358,7 @@ namespace OuterWildsRumble
                 {
                     if (mat.name.ToLower().Contains("sand") || mat.shader.name.ToLower().Contains("sand"))
                     {
-                        MelonLogger.Msg("Found sand, ignoring");
+                        //MelonLogger.Msg("Found sand, ignoring");
                         continue;
                     }
                     mat.shader = vanillaShader;
@@ -832,6 +832,7 @@ namespace OuterWildsRumble
         public GameObject Interloper;
 
         public GameObject PlayerShip;
+        public GameObject SignalScope;
 
         public Material BlackHoleMaterial;
         public Material WhiteHoleMaterial;

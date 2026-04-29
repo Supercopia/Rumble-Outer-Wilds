@@ -146,7 +146,7 @@ public class SupernovaSun : MonoBehaviour
 
         requiredTarget = CreateRequiredTarget(Main.solarSystem.WhiteHole);
     }
-    
+
     public IEnumerator FindPlayerAndSetup()
     {
         while (Calls.Players.GetLocalPlayer() == null || 
@@ -222,7 +222,7 @@ public class SupernovaSun : MonoBehaviour
 
         GameObject inteloper = Main.solarSystem.Interloper;
 
-        if (inteloper.activeSelf && Vector3.Distance(inteloper.transform.position,transform.position) < 3.2f)
+        if (inteloper.activeSelf && Vector3.Distance(inteloper.transform.position,transform.position) < 5.2f)
         {
             inteloper.SetActive(false);
         }
@@ -274,6 +274,7 @@ public class SupernovaSun : MonoBehaviour
             if (currentRadius >= dist + body.radius + extraDistance)
             {
                 tr.gameObject.SetActive(false);
+                Main.solarSystem.SignalScope.GetComponent<SignalScope>().StopMusicEmitter(tr.gameObject); //This should be fine
             }
         }
 
@@ -374,7 +375,7 @@ public class SupernovaSun : MonoBehaviour
             superCore = startCore;
             superCore.SunBright = 1.8f;
             superCore.Color2 = Color.white;
-            superCore.Color1 = Color.cyan;
+            superCore.Color1 = Color.cornflowerBlue;
             superCore.Color3 = Color.mediumBlue;
             superCore.Color4 = Color.deepSkyBlue;
         }
@@ -594,8 +595,11 @@ public class SupernovaSun : MonoBehaviour
 
         requiredTarget.engulfed = false;
 
-        // Re-enable the sun itself
+        Main.solarSystem.SignalScope.GetComponent<SignalScope>().TurnOffAllMusic();
+        
         gameObject.SetActive(true);
+        
+        Main.solarSystem.Root.GetComponent<SolarSystem>().StartSolarSystem();
 
         // Re-read shader defaults on next frame
         MelonCoroutines.Start(InitializeAfterFrame());

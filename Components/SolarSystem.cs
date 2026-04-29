@@ -10,6 +10,11 @@ public class SolarSystem : MonoBehaviour
 {
     public SolarSystem(IntPtr ptr) : base(ptr) {}
 
+    public void StartSolarSystem()
+    {
+        //TODO Probe cannoooooooon
+    }
+
     public void Scale(float scale)
     {
         GameObject Root = transform.gameObject;

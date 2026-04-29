@@ -219,10 +219,7 @@ public class SignalScope : MonoBehaviour
     {
         if (!isHolding)
         {
-            foreach (var emitter in musicEmitters.Values)
-            {
-                emitter.SetVolume(0f);
-            }
+            TurnOffAllMusic();
             return;
         }
 
@@ -269,5 +266,19 @@ public class SignalScope : MonoBehaviour
         }
 
         return 1f - (angleToTarget / currentDetectionAngle);
+    }
+
+
+    public void TurnOffAllMusic()
+    {
+        foreach (var emitter in musicEmitters.Values)
+        {
+            emitter.SetVolume(0f);
+        }
+    }
+
+    public void StopMusicEmitter(GameObject go)
+    {
+        musicEmitters.Remove(go);
     }
 }
